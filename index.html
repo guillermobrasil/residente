@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Sociedade do Cariótipo — para Jessica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a1310;
+    --bg-deep: #060b09;
+    --panel: #101d16;
+    --panel-edge: #22362a;
+    --gold: #c9a24b;
+    --gold-soft: #e6cd8a;
+    --teal: #3ecf8e;
+    --teal-dim: #2a5c46;
+    --ink: #eae3cf;
+    --ink-dim: #9db3a4;
+    --shadow: rgba(0,0,0,0.55);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: radial-gradient(ellipse at 50% -10%, #14251b 0%, var(--bg) 45%, var(--bg-deep) 100%);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, .rune-btn, .brand{
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.02em;
+  }
+
+  .brand{
+    font-family: 'Cinzel Decorative', serif;
+  }
+
+  /* ---------- Ambient particles (bioluminescent DNA / embers) ---------- */
+  #particles{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .mote{
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--teal) 0%, transparent 70%);
+    opacity: 0.35;
+    animation: drift linear infinite;
+  }
+  .mote.gold{ background: radial-gradient(circle, var(--gold) 0%, transparent 70%); }
+
+  @keyframes drift{
+    0%   { transform: translateY(0) translateX(0); opacity: 0; }
+    10%  { opacity: 0.4; }
+    90%  { opacity: 0.4; }
+    100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
+  }
+
+  /* ---------- Layout ---------- */
+  .stage{
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 18px 64px;
+  }
+
+  header.top{
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  header.top .brand{
+    font-size: clamp(28px, 5vw, 42px);
+    color: var(--gold-soft);
+    margin: 0 0 4px;
+    text-shadow: 0 0 18px rgba(201,162,75,0.25);
+  }
+  header.top .subtitle{
+    color: var(--ink-dim);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ---------- Progress trail (chromosome / ring path) ---------- */
+  .trail{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 36px;
+  }
+  .trail .node{
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--panel-edge);
+    border: 1px solid var(--teal-dim);
+    transition: all 0.5s ease;
+  }
+  .trail .link{
+    width: 22px;
+    height: 1px;
+    background: var(--panel-edge);
+    transition: background 0.5s ease;
+  }
+  .trail .node.done{
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(201,162,75,0.7);
+  }
+  .trail .link.done{ background: var(--gold); }
+  .trail .node.current{
+    background: var(--teal);
+    border-color: var(--teal);
+    box-shadow: 0 0 12px rgba(62,207,142,0.8);
+  }
+
+  /* ---------- Chapter card ---------- */
+  .card{
+    width: 100%;
+    max-width: 560px;
+    background: linear-gradient(180deg, var(--panel), #0c1712);
+    border: 1px solid var(--panel-edge);
+    border-radius: 6px;
+    padding: 40px 36px;
+    box-shadow: 0 24px 60px var(--shadow);
+    display: none;
+    animation: fadein 0.6s ease;
+  }
+  .card.active{ display: block; }
+
+  @keyframes fadein{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  .icon{
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 18px;
+    display: block;
+    color: var(--teal);
+    opacity: 0.9;
+  }
+
+  .card h2{
+    font-size: clamp(21px, 3.4vw, 27px);
+    color: var(--gold-soft);
+    text-align: center;
+    margin: 0 0 18px;
+  }
+
+  .card p{
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ink);
+    margin: 0 0 14px;
+  }
+
+  .card p.flavor{
+    font-style: italic;
+    color: var(--ink-dim);
+    border-left: 2px solid var(--teal-dim);
+    padding-left: 14px;
+    margin: 20px 0;
+    font-size: 14.5px;
+  }
+
+  .actions{
+    display: flex;
+    justify-content: center;
+    margin-top: 26px;
+  }
+
+  .rune-btn{
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-soft);
+    padding: 13px 30px;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .rune-btn:hover, .rune-btn:focus-visible{
+    background: var(--gold);
+    color: #0a1310;
+    box-shadow: 0 0 22px rgba(201,162,75,0.45);
+  }
+  .rune-btn:focus-visible{
+    outline: 2px solid var(--teal);
+    outline-offset: 3px;
+  }
+
+  /* ---------- Final chest / reveal ---------- */
+  .chest{
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .chest svg{ width: 100%; height: 100%; }
+
+  #gift-content{
+    display: none;
+    text-align: center;
+    animation: fadein 0.8s ease;
+  }
+  #gift-content.shown{ display: block; }
+
+  /* ===== SLOT DA IMAGEM/GIF DO PRESENTE ===== */
+  #gift-image{
+    max-width: 260px;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid var(--panel-edge);
+    box-shadow: 0 0 30px rgba(62,207,142,0.25);
+    margin: 8px auto 22px;
+    display: block;
+    background: #0c1712;
+  }
+  /* =========================================== */
+
+  .signature{
+    margin-top: 24px;
+    font-size: 13.5px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+  }
+
+  footer.credits{
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 12px;
+    padding: 0 20px 30px;
+    opacity: 0.6;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .mote{ animation: none; display: none; }
+    .card{ animation: none; }
+    #gift-content{ animation: none; }
+  }
+
+  @media (max-width: 480px){
+    .card{ padding: 30px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div class="stage">
+
+  <header class="top">
+    <h1 class="brand">A Sociedade do Cariótipo</h1>
+    <div class="subtitle">uma jornada para JESSICA · laboratório de citogenética</div>
+  </header>
+
+  <div class="trail" id="trail"></div>
+
+  <!-- CAPÍTULO 0 — O CONVITE -->
+  <section class="card" data-step="0">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+      <path d="M3 8l9 6 9-6M4 6h16v12H4z"/>
+    </svg>
+    <h2>Um pergaminho chega ao laboratório</h2>
+    <p>Jessica, guardiã dos cromossomos de Curitiba: um envelope selado apareceu sobre a bancada, entre lâminas e metáfases. Nele, uma missão.</p>
+    <p class="flavor">"Nem toda jornada começa com um anel. Algumas começam com uma metáfase bem espalhada."</p>
+    <div class="actions"><button class="rune-btn" onclick="goTo(1)">Aceitar a missão</button></div>
+  </section>
+
+  <!-- CAPÍTULO 1 — O CONDADO -->
+  <section class="card" data-step="1">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+      <path d="M4 20c2-6 4-9 8-9s6 3 8 9M9 11a3 3 0 106 0"/>
+    </svg>
+    <h2>O Condado dos Cariótipos</h2>
+    <p>Tudo começa em paz, como uma interfase tranquila: 46 cromossomos alinhados, cada um em seu lugar, nenhum sinal de aberração no horizonte.</p>
+    <p>Mas toda residente sabe: a calma da intérfase nunca dura muito tempo.</p>
+    <div class="actions"><button class="rune-btn" onclick="goTo(2)">Seguir para Moria</button></div>
+  </section>
+
+  <!-- CAPÍTULO 2 — MINAS DE MORIA -->
+  <section class="card" data-step="2">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+      <path d="M3 20l4-10 3 6 2-4 3 8M14 12l4-8 3 16"/>
+    </svg>
+    <h2>As Minas de Moria</h2>
+    <p>A escuridão desce sobre a lâmina. Ali, entre bandas G escuras, algo se esconde: uma translocação, sorrateira, esperando ser encontrada por olhos atentos.</p>
+    <p class="flavor">"Fuja, tola aberração — você foi vista."</p>
+    <div class="actions"><button class="rune-btn" onclick="goTo(3)">Escapar para Lothlórien</button></div>
+  </section>
+
+  <!-- CAPÍTULO 3 — LOTHLÓRIEN -->
+  <section class="card" data-step="3">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+      <circle cx="12" cy="12" r="8"/>
+      <path d="M12 4v16M4 12h16"/>
+    </svg>
+    <h2>A Luz de Lothlórien</h2>
+    <p>Na floresta dourada dos elfos, tudo brilha sem precisar de sol. Não muito diferente de uma sonda fluorescente encontrando exatamente a sequência que procurava, iluminando o núcleo na escuridão do microscópio.</p>
+    <p>É nessa luz que a resposta finalmente se revela.</p>
+    <div class="actions"><button class="rune-btn" onclick="goTo(4)">Seguir para Mordor</button></div>
+  </section>
+
+  <!-- CAPÍTULO 4 — MONTE DA PERDIÇÃO -->
+  <section class="card" data-step="4">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+      <path d="M2 19l7-11 4 6 3-4 6 9z"/>
+    </svg>
+    <h2>O Monte da Perdição</h2>
+    <p>A última subida é sempre a mais difícil — como fechar um laudo às sete da noite depois de recontar a mesma metáfase pela décima vez.</p>
+    <p class="flavor">"Não se pode simplesmente entrar na hematologia... mas você entrou, e chegou até aqui."</p>
+    <div class="actions"><button class="rune-btn" onclick="goTo(5)">Chegar ao topo</button></div>
+  </section>
+
+  <!-- CAPÍTULO 5 — O TESOURO -->
+  <section class="card" data-step="5">
+    <div id="chest-wrap">
+      <div class="chest">
+        <svg viewBox="0 0 100 100" fill="none">
+          <rect x="14" y="46" width="72" height="40" rx="4" fill="#1a2b21" stroke="#c9a24b" stroke-width="2"/>
+          <path d="M14 46 Q50 20 86 46" fill="#101d16" stroke="#c9a24b" stroke-width="2"/>
+          <circle cx="50" cy="58" r="5" fill="#c9a24b"/>
+        </svg>
+      </div>
+      <h2>Nem todo tesouro é um anel</h2>
+      <p>Você atravessou o Condado, escapou de Moria, viu a luz de Lothlórien e subiu a montanha. Chegou a hora de abrir o baú.</p>
+      <div class="actions"><button class="rune-btn" onclick="openGift()">Abrir o tesouro</button></div>
+    </div>
+
+    <div id="gift-content">
+      <!-- ===== IMAGEM/GIF DO PRESENTE — TROQUE AQUI (linha abaixo) ===== -->
+      <img id="gift-image" src="images/pointer.png" alt="Pointer de apresentação">
+      <!-- Para usar um GIF, troque "images/pointer.png" por "images/pointer.gif" -->
+      <!-- ================================================================ -->
+      <h2>Um pointer para guiar suas próximas descobertas</h2>
+      <p>Assim como Frodo carregava o Anel, você agora carrega este pointer — não para destruir nada no fogo, mas para apontar, explicar e brilhar em cada apresentação daqui pra frente.</p>
+      <p class="signature">— com carinho, do Laboratório de Citogenética</p>
+    </div>
+  </section>
+
+</div>
+
+<footer class="credits">feito com carinho para Jessica</footer>
+
+</div>
+
+<script>
+  const totalSteps = 6; // capítulos 0 a 5
+  let current = 0;
+
+  function buildTrail(){
+    const trail = document.getElementById('trail');
+    trail.innerHTML = '';
+    for(let i = 0; i < totalSteps; i++){
+      const node = document.createElement('div');
+      node.className = 'node';
+      node.id = 'node-' + i;
+      trail.appendChild(node);
+      if(i < totalSteps - 1){
+        const link = document.createElement('div');
+        link.className = 'link';
+        link.id = 'link-' + i;
+        trail.appendChild(link);
+      }
+    }
+  }
+
+  function updateTrail(){
+    for(let i = 0; i < totalSteps; i++){
+      const node = document.getElementById('node-' + i);
+      node.classList.remove('done', 'current');
+      if(i < current) node.classList.add('done');
+      if(i === current) node.classList.add('current');
+    }
+    for(let i = 0; i < totalSteps - 1; i++){
+      const link = document.getElementById('link-' + i);
+      link.classList.toggle('done', i < current);
+    }
+  }
+
+  function goTo(step){
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    const target = document.querySelector('.card[data-step="' + step + '"]');
+    target.classList.add('active');
+    current = step;
+    updateTrail();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function openGift(){
+    document.getElementById('chest-wrap').style.display = 'none';
+    document.getElementById('gift-content').classList.add('shown');
+  }
+
+  function spawnMotes(){
+    const field = document.getElementById('particles');
+    const count = 16;
+    for(let i = 0; i < count; i++){
+      const mote = document.createElement('div');
+      mote.className = 'mote' + (i % 3 === 0 ? ' gold' : '');
+      const size = 4 + Math.random() * 6;
+      mote.style.width = size + 'px';
+      mote.style.height = size + 'px';
+      mote.style.left = Math.random() * 100 + 'vw';
+      mote.style.bottom = '-20px';
+      mote.style.animationDuration = (14 + Math.random() * 12) + 's';
+      mote.style.animationDelay = (Math.random() * 14) + 's';
+      field.appendChild(mote);
+    }
+  }
+
+  buildTrail();
+  updateTrail();
+  spawnMotes();
+</script>
+
+</body>
+</html>
